@@ -8,34 +8,36 @@ on:
 jobs:
   send-newsletter:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: actions/checkout@v4
-      
-      - uses: actions/setup-python@v4
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v3
         with:
           python-version: '3.10'
-      
-      - run: pip install resend
-      
+
+      - name: Install dependencies
+        run: pip install resend
+
       - name: Send newsletter
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
         run: |
-          python -c "
+          python << 'PYEOF'
+          import os
           from resend import Resend
           from datetime import datetime
-          
-          client = Resend('${{ secrets.RESEND_API_KEY }}')
-          
-          html = '<h1>🚀 주간 AI & 바이브 코딩 활용법</h1><p>매주 월요일 자동 뉴스레터입니다.</p>'
-          subject = f'[AI 활용법 주간정리] {datetime.now().strftime(\"%Y.%m.%d\")}'
-          
+
+          client = Resend(os.environ["RESEND_API_KEY"])
+          html = "<h1>🚀 주간 AI & 바이브 코딩 활용법</h1><p>매주 월요일 자동 뉴스레터입니다.</p>"
+          subject = f"[AI 활용법 주간정리] {datetime.now().strftime('%Y.%m.%d')}"
+
           response = client.emails.send({
-              'from': 'claude@ai-newsletter.dev',
-              'to': 'hyungu@innocean.com',
-              'subject': subject,
-              'html': html
+              "from": "onboarding@resend.dev",
+              "to": "hyungu@innocean.com",
+              "subject": subject,
+              "html": html
           })
-          
-          print(f'✅ Email sent: {response.get(\"id\")}')"
+
+          print(f"✅ Email sent: {response}")
+          PYEOF
