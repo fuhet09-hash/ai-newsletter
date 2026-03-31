@@ -25,14 +25,14 @@ jobs:
         run: |
           python << 'PYEOF'
           import os
-          from resend import Resend
+          import resend
           from datetime import datetime
 
-          client = Resend(os.environ["RESEND_API_KEY"])
+          resend.api_key = os.environ["RESEND_API_KEY"]
           html = "<h1>🚀 주간 AI & 바이브 코딩 활용법</h1><p>매주 월요일 자동 뉴스레터입니다.</p>"
           subject = f"[AI 활용법 주간정리] {datetime.now().strftime('%Y.%m.%d')}"
 
-          response = client.emails.send({
+          response = resend.Emails.send({
               "from": "onboarding@resend.dev",
               "to": "fuhet09@gmail.com",
               "subject": subject,
@@ -41,3 +41,4 @@ jobs:
 
           print(f"✅ Email sent: {response}")
           PYEOF
+
