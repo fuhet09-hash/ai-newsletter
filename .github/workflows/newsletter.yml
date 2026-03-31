@@ -1,18 +1,21 @@
 name: Weekly AI Newsletter
 
 on:
-  schedule:
-    - cron: '0 22 * * 0'
+  push:
+    paths:
+      - 'newsletter.json'
   workflow_dispatch:
 
 jobs:
   send-newsletter:
     runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v3
+      - uses: actions/setup-python@v4
         with:
           python-version: '3.10'
 
@@ -25,20 +28,20 @@ jobs:
         run: |
           python << 'PYEOF'
           import os
+          import json
           import resend
-          from datetime import datetime
-
+          
+          with open("newsletter.json", "r", encoding="utf-8") as f:
+              data = json.load(f)
+          
           resend.api_key = os.environ["RESEND_API_KEY"]
-          html = "<h1>🚀 주간 AI & 바이브 코딩 활용법</h1><p>매주 월요일 자동 뉴스레터입니다.</p>"
-          subject = f"[AI 활용법 주간정리] {datetime.now().strftime('%Y.%m.%d')}"
-
+          
           response = resend.Emails.send({
               "from": "onboarding@resend.dev",
               "to": "fuhet09@gmail.com",
-              "subject": subject,
-              "html": html
+              "subject": data["subject"],
+              "html": data["html"]
           })
-
+          
           print(f"✅ Email sent: {response}")
           PYEOF
-
