@@ -34,7 +34,7 @@ jobs:
 
           response = client.emails.send({
               "from": "onboarding@resend.dev",
-              "to": "hyungu@innocean.com",
+              "to": "fuhet09@gmail.com",
               "subject": subject,
               "html": html
           })
